@@ -19,6 +19,7 @@ public class RSA {
 	
 	/**
 	 * Main method - testing project
+	 * TODO: Clean up all the commented stuff
 	 */
 	public static void main(String[] args) {
 //		System.out.println(toLong("123456789", 0));
@@ -27,18 +28,14 @@ public class RSA {
 		Random rand = new Random();
 		System.out.println(randPrime(60, 500, rand));
 		System.out.println(relPrime(50, rand));
-		long testLong = (0xFF);
+		int testCharNum = (0x00410042);
 		//System.out.println("With shifting: " + Long.toBinaryString(testLong >> Long.size(testLong)-8));
 //		System.out.println("As byte: " + (byte) (testLong >> 58));
 		//System.out.println(Long.toBinaryString());
 //		System.out.println(Long.toBinaryString(testLong));
 //		System.out.println(testLong);
-		try {
-//			System.out.println(longTo2Chars(testLong));
-		}
-		catch(Exception e) {
-			
-		}
+		System.out.println(to2Chars(testCharNum));
+		System.out.println(Integer.toBinaryString(toInt("ABC", 0)));
 //		toLong("AB", 0);
 		
 	}
@@ -95,50 +92,44 @@ public class RSA {
 	}
 	
 	/**
-	 * 
+	 * Convert two chars to int in UTF-16 format
 	 * @param msg
 	 * @param p
-	 * @return
+	 * @return the two digit number beginning at position p of msg as an int
 	 */
-	public static long toLong(java.lang.String msg, int p) {
-		String resultString;
+	public static int toInt(java.lang.String msg, int p) {
 		char[] msgArray = msg.toCharArray();
-		long result;
+		int result;
 		
-		result = msgArray[0] & (msgArray[1] << 16);
-		System.out.println(Long.toBinaryString((long) msgArray[0]));
-		System.out.println(msgArray[1]);
-		System.out.println(Long.toBinaryString(result));
+		if(p >= 0 && p < msg.length()-1) {
+			result = (msgArray[p] << 16) | (msgArray[p+1]);
+		}
+		else {
+			// Pad with zeroes if there is no second character
+			result = (msgArray[p] << 16);
+		}
 		
 		return result;
 	}
 	
 	/**
-	 * Converts a long int to two characters
+	 * Converts an int (two characters in UTF-16 format) into a string
 	 * @param x
-	 * @return
+	 * @return the string represented by x - two characters in UTF-16 format
 	 */
-	public static String longTo2Chars(long x) throws UnsupportedEncodingException {
+	public static String to2Chars(int x) {
 		byte[] chars = new byte[2];
+		int mask1 = 0xffff0000;
+		int mask2 = 0x0000ffff;
 		
-		System.out.println(Long.toBinaryString(x << 56));
-		
-		long mask1 = 0x00000000000000ffL;
-		long mask2 = 0x000000000000ff00L;
-//		
-//		System.out.println("Input: " + Long.toBinaryString(x));
-		chars[0] = (byte) (x & mask2);
-		System.out.println("Mask 1: " + (x & mask1));
-//		chars[1] = (byte) (x >> 8);
-//		
-//		System.out.println("Array 1: " + chars[0]);
-//		System.out.println("Array 2: " + chars[1]);
-//		return new String(chars, "UTF-8");
-		return null;
+		char char1 = (char) ((x & mask1) >> 16);
+		char char2 = (char) (x & mask2);
+		return "" + char1 + char2;
 	}
 	
 	/*
 	 * Check if parameter is prime
+	 * Uses a brute force method - iterates through 2..sqrt(l)
 	 */
 	private static boolean isPrime(long l) {
 		if(l == 2) return true;
